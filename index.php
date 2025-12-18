@@ -18,7 +18,9 @@ require(__DIR__ . "/backend/vendor/autoload.php");
 </head>
 
 <body>
+    <?php
 
+    ?>
 
     <form action="/backend/booking.php" method="post" class="booking">
 
@@ -144,6 +146,22 @@ require(__DIR__ . "/backend/vendor/autoload.php");
 
         <button name="submit" type="submit">Book your visit now!</button>
 
+
+        <?php
+        if (isset($_GET['status'])) {
+            if ($_GET['status'] === 'success') {
+                echo '<p class="success-message">Booking saved successfully!</p>';
+            }
+
+            if ($_GET['status'] === 'transfer_expired') {
+                echo '<p class="error-message">Transfer code expired. Please enter a valid code.</p>';
+            }
+
+            if ($_GET['status'] === 'error') {
+                echo '<p class="error-message">Something went wrong. Please try again.</p>';
+            }
+        }
+        ?>
 
 
 
