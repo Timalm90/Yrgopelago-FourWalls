@@ -3,18 +3,55 @@
   --primary-color: #F9B487;
   --accent-color: #427A76;
   --accent-dark-color: #174143;
-/* accent dark used for titles etc */
+  font-family: ;
 }
 
+html, body {
+    margin: 0;
+    padding: 0;
+    background: black;
+}
 
+/* Cinematic container */
+.hotelWrapper {
+    position: relative;
+    width: 100vw;
+    max-width: 1920px;        /* ultra-wide breakpoint */
+    margin: 0 auto;           /* letterboxing */
+    aspect-ratio: 7270 / 5215;
+    background: black;
+}
+
+/* SVG container */
+#hotel {
+    width: 100%;
+    height: 100%;
+}
+
+/* SVG itself */
+#hotel svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    preserveAspectRatio: xMidYMid meet;
+}
+
+/* Booking form stays inside SVG */
 .booking {
+    position: absolute;
+      display: flex;
 
-  display: flex;
   justify-content: center;
-  background-color: var(--accent-dark-color);
+
   flex-direction: column;
-  padding: 1rem;
-  color: var(--background-color);
+
+    top: 10%;
+    left: 5%;
+    width: min(40%, 500px);
+    background-color: var(--accent-dark-color);
+    padding: 1rem;
+    color: var(--background-color);
+    z-index: 2;
 }
 
 
@@ -30,12 +67,17 @@ button {
 
 .featureWrapper {
 
-  padding: 2vw;
+  padding: 1vw;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1vw;
 }
 
+.block{
+
+    /* white-space: nowrap; */
+
+}
 
 .featureCategory {
   display: flex;
@@ -59,3 +101,20 @@ button {
   line-height: 1.5rem;
   --tw-shadow: 0 0 #0000;
 }
+
+.Button-message {
+  display: flex; 
+  flex-direction: row;
+  align-items: center;
+}
+
+.Submit-button {
+}
+
+.message {
+font-size: 1.1rem;
+/* background-color: var(--accent-color); */
+
+}
+
+

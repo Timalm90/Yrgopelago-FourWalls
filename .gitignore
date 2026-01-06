@@ -1,8 +1,5 @@
 .DS_Store
 .env
 vendor
-# SQLite database
 /backend/database/database.db
-database.db
-
 

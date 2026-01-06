@@ -1,180 +1,141 @@
 <?php
 
 declare(strict_types=1);
-require(__DIR__ . "/backend/vendor/autoload.php");
-?>
 
+$database = new PDO('sqlite:' . __DIR__ . '/backend/database/database.db');
+$database->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+/*
+ Fetch only unlocked features
+*/
+
+$stmt = $database->query("
+    SELECT 
+        f.id,
+        f.category,
+        f.tier,
+        f.feature_name,
+        f.price
+    FROM features f
+    JOIN hotel_features hf ON hf.feature_id = f.id
+    ORDER BY f.category, f.id
+");
+
+$features = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+/*
+ Group features by category
+*/
+
+$featuresByCategory = [];
+
+foreach ($features as $feature) {
+    $category = $feature['category'];
+    $featuresByCategory[$category][] = $feature;
+}
+?>
 
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yrgopelago</title>
+    <title>BronxLand</title>
     <link rel="stylesheet" href="frontend/styles/styles.css">
-
-
 </head>
 
 <body>
-    <?php
 
-    ?>
+    <section class="hotelWrapper">
 
-    <form action="/backend/booking.php" method="post" class="booking">
+        <!-- Graphics container-->
 
-        <label for="guestId" class="block mt-3">Your name (guest_id)</label>
-        <input type="text" name="guestId" class="form-input" required="">
+        <div id="hotel"></div>
 
-        <label for="transferCode" class="block mt-3">transferCode</label>
-        <input type="text" name="transferCode" class="form-input" required="">
+        <!-- Booking-->
 
 
-        <label for="arrival" class="block mt-3">Arrival</label>
-        <input type="date" name="arrival" class="form-input" min="2026-01-01" max="2026-01-31">
+        <form action="/backend/booking.php" method="post" class="booking">
 
-        <label for="departure" class="block mt-3">Departure</label>
-        <input type="date" name="departure" class="form-input" min="2026-01-01" max="2026-01-31">
+            <label>Your name</label>
+            <input type="text" name="guestId" required>
 
-        <label for="room" class="block mt-3">Room</label>
-        <select name="room" id="" class="form-input pr-12">
-            <option value="1">Economy</option>
-            <option value="2">Standard</option>
-            <option value="3">Luxury</option>
-        </select>
+            <label>Transfer code</label>
+            <input type="text" name="transferCode" required>
+
+            <label>Arrival</label>
+            <input type="date" name="arrival">
+
+            <label>Departure</label>
+            <input type="date" name="departure">
+
+            <label>Room</label>
+            <select name="room">
+                <option value="1">Economy $2.0</option>
+                <option value="2">Standard $4.0</option>
+                <option value="3">Luxury $8.0</option>
+            </select>
 
 
-        <br>
-        <label for="features" class="block mt-6">Features</label>
+            <br>
+            <label class="block mt-6">
+                <h3>Features</h3>
+            </label>
 
-        <section class="featureWrapper">
-            <div class="featureCategory">
-                <p>Water</p>
+            <!-- Puts features in correct categories-->
 
-                <label class="block ml-2">
-                    <input class="mr-2" type="checkbox" name="features[]" value="1">
-                    Pool (Economy, $0.5)
-                </label>
+            <section class="featureWrapper">
 
-                <label class="block ml-2">
-                    <input class="mr-2" type="checkbox" name="features[]" value="2">
-                    Scuba Diving (Basic, $1)
-                </label>
+                <?php foreach ($featuresByCategory as $category => $features): ?>
 
-                <label class="block ml-2">
-                    <input class="mr-2" type="checkbox" name="features[]" value="3">
-                    Olympic Pool (Premium, $1.5)
-                </label>
+                    <div class="featureCategory feature-category-<?= htmlspecialchars($category) ?>">
+                        <p class="feature-title"><?= ucfirst($category) ?></p>
 
-                <label class="block ml-2">
-                    <input class="mr-2" type="checkbox" name="features[]" value="4">
-                    waterpark with fire and minibar (superior, $2)
-                </label>
+                        <?php foreach ($features as $feature): ?>
+                            <label class="block ml-2 feature-tier-<?= htmlspecialchars($feature['tier']) ?>">
+                                <input
+                                    class="mr-2"
+                                    type="checkbox"
+                                    name="features[]"
+                                    value="<?= (int)$feature['id'] ?>">
+                                <?= ucfirst(htmlspecialchars($feature['feature_name'])) ?>
+                                (<?= ucfirst($feature['tier']) ?>, $<?= number_format($feature['price'], 1) ?>)
+                            </label>
+                        <?php endforeach; ?>
+
+                    </div>
+
+                <?php endforeach; ?>
+
+            </section>
+
+            <div class="Button-message">
+                <button type="submit" class="Submit-button">Book now</button>
+
+                <div class="message">
+                    <?php
+                    $status = $_GET['status'] ?? '';
+                    $messages = [
+                        'success' => 'Booking successful!',
+                        'transfer_expired' => 'Transfer code expired.',
+                        'transfer_invalid' => 'Transfer code invalid.',
+                        'departure_date_error' => 'Departure cannot be before arrival.',
+                        'error' => 'Something went wrong.'
+                    ];
+                    if (isset($messages[$status])) {
+                        echo "<p> {$messages[$status]}</p>";
+                    }
+                    ?>
+                </div>
             </div>
-            <div class="featureCategory">
-                <p>Games</p>
+        </form>
 
-                <label class="block ml-2">
-                    <input class="mr-2" type="checkbox" name="features[]" value="5">
-                    Yahtzee (Economy, $0.5)
-                </label>
-
-                <label class="block ml-2">
-                    <input class="mr-2" type="checkbox" name="features[]" value="6">
-                    Ping pong table (Basic, $1)
-                </label>
-
-                <label class="block ml-2">
-                    <input class="mr-2" type="checkbox" name="features[]" value="7">
-                    PS5 (Premium, $1.5)
-                </label>
-
-                <label class="block ml-2">
-                    <input class="mr-2" type="checkbox" name="features[]" value="8">
-                    Casino (superior, $2)
-                </label>
-            </div>
-            <div class="featureCategory">
-                <p>Wheels</p>
-
-                <label class="block ml-2">
-                    <input class="mr-2" type="checkbox" name="features[]" value="9">
-                    Unicycle (Economy, $0.5)
-                </label>
-
-                <label class="block ml-2">
-                    <input class="mr-2" type="checkbox" name="features[]" value="10">
-                    Bicycle (Basic, $1)
-                </label>
-
-                <label class="block ml-2">
-                    <input class="mr-2" type="checkbox" name="features[]" value="11">
-                    Trike (Premium, $1.5)
-                </label>
-
-                <label class="block ml-2">
-                    <input class="mr-2" type="checkbox" name="features[]" value="12">
-                    Four-wheeled motorized beast (superior, $2)
-                </label>
-            </div>
-            <div class="featureCategory">
-                <p>Hotel-specific</p>
-
-                <label class="block ml-2">
-                    <input class="mr-2" type="checkbox" name="features[]" value="13">
-                    Carpet (Economy, $0.5)
-                </label>
-
-                <label class="block ml-2">
-                    <input class="mr-2" type="checkbox" name="features[]" value="14">
-                    Good Dog (Basic, $1)
-                </label>
-
-                <label class="block ml-2">
-                    <input class="mr-2" type="checkbox" name="features[]" value="15">
-                    Fireplace (Premium, $1.5)
-                </label>
-
-                <label class="block ml-2">
-                    <input class="mr-2" type="checkbox" name="features[]" value="16">
-                    Butler (superior, $2)
-                </label>
-            </div>
-        </section>
-
-
-        <button name="submit" type="submit">Book your visit now!</button>
-
-
-        <?php
-        if (isset($_GET['status'])) {
-            if ($_GET['status'] === 'success') {
-                echo '<p class="success-message">Booking saved successfully!</p>';
-            }
-
-            if ($_GET['status'] === 'transfer_expired') {
-                echo '<p class="error-message">Transfer code expired. Please enter a valid code.</p>';
-            }
-
-            if ($_GET['status'] === 'error') {
-                echo '<p class="error-message">Something went wrong. Please try again.</p>';
-            }
-        }
-        ?>
+    </section>
 
 
 
-
-
-
-
-
-
-
-
-
-        <scrpt src="/frontend/scripts/main.js"></scrpt>
+    <script src="frontend/scripts/hotel.js"></script>
 </body>
+
 
 </html>
