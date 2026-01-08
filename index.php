@@ -1,60 +1,7 @@
 <?php
 
 declare(strict_types=1);
-session_start();
-
-$database = new PDO('sqlite:' . __DIR__ . '/backend/database/database.db');
-$database->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-/*
- Fetch rooms
-*/
-$roomsStmt = $database->query("
-    SELECT id, tier, price_per_night, description
-    FROM rooms
-    ORDER BY price_per_night ASC
-");
-$rooms = array_reverse($roomsStmt->fetchAll(PDO::FETCH_ASSOC));
-
-/*
- Fetch unlocked features
-*/
-$stmt = $database->query("
-    SELECT 
-        f.id,
-        f.category,
-        f.tier,
-        f.feature_name,
-        f.price
-    FROM features f
-    JOIN hotel_features hf ON hf.feature_id = f.id
-    ORDER BY f.category, f.id
-");
-$features = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-/*
- Group features
-*/
-$featuresByCategory = [];
-foreach ($features as $feature) {
-    $featuresByCategory[$feature['category']][] = $feature;
-}
-
-/*
- Status messages
-*/
-$status = $_GET['status'] ?? null;
-
-$statusMessages = [
-    'success' => 'Booking successful!',
-    'transfer_expired' => 'Transfer code expired.',
-    'transfer_invalid' => 'Transfer code invalid.',
-    'departure_date_error' => 'Departure cannot be before arrival.',
-    'room_unavailable' => 'Selected room is not available for those dates.',
-    'error' => 'Something went wrong.'
-];
-
-$showModal = $status && isset($statusMessages[$status]);
+require __DIR__ . '/loadData.php';
 ?>
 
 <!DOCTYPE html>
@@ -62,41 +9,16 @@ $showModal = $status && isset($statusMessages[$status]);
 
 <head>
     <meta charset="UTF-8">
-    <title>FourWalls</title>
+    <title>Four Walls</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Notable&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noticia+Text:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="frontend/styles/styles.css">
 
-    <!-- Minimal modal styling (does NOT affect layout) -->
-    <style>
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, .7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
 
-        .modal-box {
-            background: #fff;
-            padding: 2rem;
-            max-width: 420px;
-            width: 90%;
-            position: relative;
-            border-radius: 6px;
-        }
 
-        .modal-close {
-            position: absolute;
-            top: 10px;
-            right: 14px;
-            cursor: pointer;
-            font-size: 20px;
-        }
-    </style>
 </head>
 
 <body>
@@ -107,16 +29,10 @@ $showModal = $status && isset($statusMessages[$status]);
 
         <form action="/backend/booking.php" method="post" class="booking">
 
-            <label>Your name</label>
-            <input type="text" name="guestId" required>
-
-            <label>Transfer code</label>
-            <input type="text" name="transferCode" required>
-
             <!-- ROOMS -->
             <div class="room">
 
-                <div class="room_type">
+                <div class="room-type">
                     <h2>Room Type</h2>
 
                     <?php foreach ($rooms as $room): ?>
@@ -128,47 +44,56 @@ $showModal = $status && isset($statusMessages[$status]);
                                 data-room-id="<?= (int)$room['id'] ?>"
                                 data-room-tier="<?= htmlspecialchars($room['tier']) ?>"
                                 data-room-price="<?= (float)$room['price_per_night'] ?>"
+                                <?= isset($old['room']) && (int)$old['room'] === (int)$room['id'] ? 'checked' : '' ?>
                                 required>
 
-                            <span class="room-name"><?= ucfirst($room['tier']) ?></span>
-                            <span class="room-price">$<?= number_format($room['price_per_night'], 2) ?></span>
+                            <span class="room-name"><?= ucfirst($room['tier']) ?>
+                                $<?= number_format($room['price_per_night'], 2) ?></span>
+
                         </label>
                     <?php endforeach; ?>
 
                     <p class="room-description" id="roomDescription"></p>
                 </div>
 
+                <!-- CALENDAR -->
+
                 <div class="calendarWrapper">
+
                     <div class="calendar">
                         <h2>January</h2>
                         <div class="calendar-grid" id="calendarGrid"></div>
                     </div>
 
                     <label>Arrival</label>
-                    <input type="date" name="arrival" min="2026-01-01" max="2026-01-31" required>
+                    <input type="date" name="arrival"
+                        value="<?= htmlspecialchars($old['arrival'] ?? '') ?>"
+                        min="2026-01-01" max="2026-01-31" required>
 
                     <label>Departure</label>
-                    <input type="date" name="departure" min="2026-01-02" max="2026-02-01" required>
+                    <input type="date" name="departure"
+                        value="<?= htmlspecialchars($old['departure'] ?? '') ?>"
+                        min="2026-01-02" max="2026-02-01" required>
                 </div>
 
             </div>
 
             <!-- FEATURES -->
-            <h3>Features</h3>
-
             <section class="featureWrapper">
                 <?php foreach ($featuresByCategory as $category => $features): ?>
                     <div class="featureCategory feature-category-<?= htmlspecialchars($category) ?>">
-                        <p class="feature-title"><?= ucfirst($category) ?></p>
+                        <h3 class="feature-title"><?= ucfirst($category) ?></h3>
 
                         <?php foreach ($features as $feature): ?>
-                            <label class="feature-tier-<?= htmlspecialchars($feature['tier']) ?>">
+                            <label class="feature-text feature-tier-<?= htmlspecialchars($feature['tier']) ?>">
                                 <input
                                     type="checkbox"
                                     name="features[]"
                                     value="<?= (int)$feature['id'] ?>"
                                     data-price="<?= (float)$feature['price'] ?>"
-                                    data-feature-name="<?= htmlspecialchars($feature['feature_name']) ?>">
+                                    data-feature-name="<?= htmlspecialchars($feature['feature_name']) ?>"
+                                    <?= in_array((int)$feature['id'], $old['features'] ?? [], true) ? 'checked' : '' ?>>
+
                                 <?= ucfirst(htmlspecialchars($feature['feature_name'])) ?>
                                 (<?= ucfirst($feature['tier']) ?>,
                                 $<?= number_format($feature['price'], 1) ?>)
@@ -178,13 +103,30 @@ $showModal = $status && isset($statusMessages[$status]);
                 <?php endforeach; ?>
             </section>
 
-            <p>Total price: <strong id="livePrice">$0.00</strong></p>
+            <!-- USER INPUT -->
+            <div class="input">
+                <label>
+                    <h4>Name</h4>
+                </label>
+                <input type="text" name="guestId" required
+                    value="<?= htmlspecialchars($old['guestId'] ?? '') ?>">
+
+                <label>
+                    <h4>Transfer Code</h4>
+                </label>
+                <input type="text" name="transferCode" required>
+
+            </div>
+
+            <!-- SUM / BOOKING-->
+
+            <h2>Total price: <strong id="livePrice">$0.00</strong></h2>
 
             <button type="submit">Book now</button>
 
         </form>
 
-        <!-- MODAL (SUCCESS + ERRORS) -->
+        <!-- MODAL (Messages) -->
         <?php if ($showModal): ?>
             <div class="modal-overlay" onclick="this.remove()">
                 <div class="modal-box" onclick="event.stopPropagation()">
@@ -231,5 +173,13 @@ $showModal = $status && isset($statusMessages[$status]);
     <script src="frontend/scripts/hotel.js"></script>
 
 </body>
+<footer>
+    <p class="marquee">
+        <span>Returning guests get a 10% discount after checkout. &nbsp;</span>
+    </p>
+    <p class="marquee marquee2">
+        <span>Returning guests get a 10% discount after checkout. &nbsp;</span>
+    </p>
+</footer>
 
 </html>

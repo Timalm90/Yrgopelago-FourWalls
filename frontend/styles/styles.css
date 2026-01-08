@@ -3,12 +3,22 @@
   --primary-color: #F9B487;
   --accent-color: #427A76;
   --accent-dark-color: #174143;
-  font-family: ;
+  --form-control-color: #174143;
+  --form-background: #F5E5E1;
+
 }
 
-h2, h3, p {
+h2, h3, h4 {
 
     font-family: "Notable", sans-serif;
+
+}
+
+p, .room-name, .feature-text {
+color: #4D1207;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 200;
+  
 
 }
 
@@ -16,38 +26,43 @@ h2, h3, p {
 html, body {
     margin: 0;
     padding: 0;
-    background: black;
+    background: #0E1A2C;
 }
 
-/* Cinematic container */
 .hotelWrapper {
     position: relative;
     width: 100vw;
     max-width: 1920px;        /* ultra-wide breakpoint */
     margin: 0 auto;           /* letterboxing */
     aspect-ratio: 7270 / 5215;
-    background: black;
+    background: #0E1A2C;
+
+    
+    
 }
 
 /* SVG container */
 #hotel {
-    width: 100%;
+    width: 100vw
     height: 100%;
+    
 }
 
-/* SVG itself */
+
+
+
+
 #hotel svg {
-    width: 100%;
+    width: 100vw;
     height: 100%;
     transform: translateY(-10%);
     display: block;
-    preserveAspectRatio: xMidYMid meet;
+    
 }
 
-/* Booking form stays inside SVG */
 .booking {
     position: absolute;
-      display: flex;
+    display: flex;
 
   justify-content: center;
 
@@ -56,7 +71,6 @@ html, body {
     top: 10%;
     left: 5%;
     width: min(40%, 500px);
-    background-color: var(--accent-dark-color);
     padding: 1rem;
     color: var(--background-color);
     z-index: 2;
@@ -74,24 +88,27 @@ button {
 }
 
 .featureWrapper {
-
-  padding: 1vw;
+  
+  margin-top: 1rem;
+  background: #f9b457;
+  border-radius: 16px;
+  width: 100%;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1vw;
-}
-
-.block{
-
-    /* white-space: nowrap; */
 
 }
 
 .featureCategory {
-  display: flex;
+  margin: 1rem;
+  margin-top: 0rem;
+    display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: start;
+  padding-bottom: 1rem;
 }
+
+
+
 
 .form-input,.form-textarea,.form-select,.form-multiselect {
   -webkit-appearance: none;
@@ -126,18 +143,24 @@ font-size: 1.1rem;
 }
 
 
+
+
+
+
 .room {
   display: flex;
   justify-content: space-between;
   background: #f9b457;
   border-radius: 16px;
   width: 100%;
-  gap: rem;
+  
+
 }
 
-.room_type {
+.room-type {
   align-items: start;
   padding: 1rem;
+  padding-top: 0rem;
 
 
 
@@ -158,6 +181,7 @@ font-size: 1.1rem;
   margin-top: 1rem;
   font-style: italic;
     white-space: pre-line;
+    font-size: .8rem;
 
 }
 
@@ -165,18 +189,30 @@ font-size: 1.1rem;
 
 /*------CALENDAR---------- */
 
+
+
 .calendarWrapper {
-padding: 1rem;
-margin-bottom: 20px;
+  margin: .3rem;
+  border-radius: 16px;
+padding: 10px;
 display: flex;
 flex-direction: column;
 justify-content: center;
+background-color: #d16600;
 
 }
 
 
-.calendar {
-    /* padding: 1rem; */
+.calendar h2{
+margin: 0;
+margin-bottom: 10px;
+padding: 0;
+border-radius:  6px;
+font-size: 1.2rem;
+display: flex;
+justify-content: center;
+background-color: #4D1207;
+
 }
 
 
@@ -206,4 +242,147 @@ justify-content: center;
 
 .calendar-day.empty {
     visibility: hidden;
+}
+
+
+
+ .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .modal-box {
+            background: #fff;
+            padding: 2rem;
+            max-width: 420px;
+            width: 90%;
+            position: relative;
+            border-radius: 6px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 14px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+
+
+
+
+/* Radio Buttons edit */
+
+form {
+  display: grid;
+  place-content: center;
+  min-height: 100vh;
+}
+
+.form-control {
+  font-family: system-ui, sans-serif;
+  font-size: 2rem;
+  font-weight: bold;
+  line-height: 1.1;
+  display: grid;
+  grid-template-columns: 1em auto;
+  gap: 0.5em;
+}
+
+.form-control + .form-control {
+  margin-top: 1em;
+}
+
+.form-control:focus-within {
+  color: var(--form-control-color);
+}
+
+input[type="radio"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: var(--form-background);
+  margin: 0;
+
+  font: inherit;
+  color: currentColor;
+  width: 1.15em;
+  height: 1.15em;
+  border: 0.15em solid currentColor;
+  border-radius: 10%;
+
+  display: grid;
+  place-content: center;
+  margin-right: 10px;
+}
+
+input[type="radio"]::before {
+  content: "";
+  width: 0.65em;
+  height: 0.65em;
+  border-radius: 10%;
+  transform: scale(0);
+  transition: 120ms transform ease-in-out;
+  box-shadow: inset 1em 1em var(--form-control-color);
+}
+
+input[type="radio"]:checked::before {
+  transform: scale(1.8);
+}
+
+
+footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  bottom: 0;
+  width: 100vw;
+  height: 5vh;
+  background-color: #000000;
+  z-index: 4;
+}
+
+footer p {
+
+    color: white;
+  font-size: 1.5rem;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 900;
+
+}
+
+
+
+
+.marquee {
+  margin: 0 auto;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  position: absolute;
+}
+
+.marquee span {
+  display: inline-block;
+  padding-left: 100%;
+  animation: marquee 30s linear infinite;
+}
+
+.marquee2 span {
+  animation-delay: 15s;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(-100%, 0);
+  }
 }

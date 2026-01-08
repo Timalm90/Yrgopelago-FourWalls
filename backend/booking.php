@@ -36,15 +36,16 @@ if (!$guestName || !$transferCode || !$arrival || !$departure || !$roomId) {
 /* =======================
    NIGHTS
 ======================= */
-$start = new DateTime($arrival . ' 15:00');
-$end   = new DateTime($departure . ' 11:00');
+$start = new DateTime($arrival);
+$end   = new DateTime($departure);
 
 if ($end <= $start) {
     header('Location: /index.php?status=departure_date_error');
     exit;
 }
 
-$nights = max(1, $start->diff($end)->days);
+$nights = (int)$start->diff($end)->days;
+if ($nights < 1) $nights = 1;
 
 /* =======================
    OVERLAP CHECK
@@ -77,7 +78,7 @@ $bankAmount = $room['price_per_night'] * $nights;
 $finalPrice = $bankAmount;
 
 /* =======================
-   FEATURES
+   FEATURES 
 ======================= */
 $featureNames = [];
 
@@ -91,13 +92,13 @@ if ($features) {
     $stmt->execute(array_map('intval', $features));
 
     foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $f) {
-        $finalPrice += (float)$f['price'];
+        $finalPrice += (float)$f['price']; // 
         $featureNames[] = $f['feature_name'];
     }
 }
 
 /* =======================
-   GUEST / DISCOUNT
+    DISCOUNT
 ======================= */
 $stmt = $db->prepare('SELECT id, visits FROM guests WHERE name = :n');
 $stmt->execute([':n' => $guestName]);
@@ -122,7 +123,7 @@ if ($guest) {
 }
 
 /* =======================
-   CENTRAL BANK (ROOM ONLY)
+   CENTRAL BANK 
 ======================= */
 $bank = new CentralBankService();
 
@@ -137,15 +138,15 @@ if (!$bank->validateTransfer($transferCode, $bankAmount)) {
 $stmt = $db->prepare("
     INSERT INTO bookings
     (room_id, guest_id, arrival_date, departure_date, transfer_code, price, creation_time)
-    VALUES (:r,:g,:a,:d,:c,:p,DATE('now'))
+    VALUES (:room,:guest,:arrival,:departure,:code,:price,DATE('now'))
 ");
 $stmt->execute([
-    ':r' => $roomId,
-    ':g' => $guestId,
-    ':a' => $arrival,
-    ':d' => $departure,
-    ':c' => $transferCode,
-    ':p' => round($finalPrice, 2),
+    ':room' => $roomId,
+    ':guest' => $guestId,
+    ':arrival' => $arrival,
+    ':departure' => $departure,
+    ':code' => $transferCode,
+    ':price' => round($finalPrice, 2),
 ]);
 
 /* =======================
