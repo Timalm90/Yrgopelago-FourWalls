@@ -1,6 +1,7 @@
 Yrgopelag - Four Walls 
-
+<img width="857" height="348" alt="Screenshot 2026-04-20 at 11 08 45" src="https://github.com/user-attachments/assets/23efe737-ed7d-47c8-8e12-420390ddc322" />
 Four Walls is a hotel booking website for a fictional hotel in the Yrgopelag archipelago.
+
 
 Visitors can book one of three available rooms (Economy, Standard, or Luxury) for stays in January 2026. A booking includes selecting arrival and departure dates, optional hotel features, and completing payment using a transfer code from a mock banking service. 
 
