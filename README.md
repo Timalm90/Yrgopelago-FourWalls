@@ -1,7 +1,9 @@
 Yrgopelag - Four Walls 
-<img width="857" height="348" alt="Screenshot 2026-04-20 at 11 08 45" src="https://github.com/user-attachments/assets/23efe737-ed7d-47c8-8e12-420390ddc322" />
-Four Walls is a hotel booking website for a fictional hotel in the Yrgopelag archipelago.
 
+<img width="857" height="348" alt="Screenshot 2026-04-20 at 11 08 45" src="https://github.com/user-attachments/assets/23efe737-ed7d-47c8-8e12-420390ddc322" />
+Yrgopelag - Four Walls 
+
+Four Walls is a hotel booking website for a fictional hotel in the Yrgopelag archipelago.
 
 Visitors can book one of three available rooms (Economy, Standard, or Luxury) for stays in January 2026. A booking includes selecting arrival and departure dates, optional hotel features, and completing payment using a transfer code from a mock banking service. 
 
@@ -11,19 +13,57 @@ The system prevents overlapping bookings, applies a 10% discount for returning g
 
 The project is built using PHP, SQLite, HTML, CSS, and JavaScript, with payment handling integrated via the Yrgopelag Central Bank API.
 
-
 The application is designed for desktop use only.
 
+---
 
+## Prerequisites
 
-References:
+Before installing Four Walls, ensure you have the following installed on your system:
 
-Custom radio buttons:
-https://moderncss.dev/pure-css-custom-styled-radio-buttons/
+- **PHP** (version 8.0 or higher)
+- **Composer** (PHP dependency manager)
+- **SQLite3** (usually included with PHP)
 
-SVG integration, and loading data: 
-https://www.youtube.com/watch?v=tk3ivPgOwpc&t=215s
+## Installation
 
+Follow these steps to set up Four Walls locally:
 
+### 1. Clone the Repository
+```bash
+git clone https://github.com/Timalm90/Yrgopelago.git
+cd Yrgopelago
+```
 
+### 2. Install PHP Dependencies
+```bash
+composer install
+```
 
+This will install the required packages:
+- `vlucas/phpdotenv` - For environment variable management
+- `guzzlehttp/guzzle` - For HTTP requests to the Central Bank API
+
+### 3. Set Up Environment Variables
+Create a `.env` file in the root directory with your Central Bank API configuration:
+```
+BANK_API_URL=https://api.yrgopelag.local
+BANK_API_KEY=your_api_key_here
+```
+
+### 4. Initialize the Database
+The SQLite database is included at `backend/database/database.db`. If needed, you can reinitialize it by running:
+```bash
+php loadData.php
+```
+
+### 5. Run a Local Server
+Start a PHP development server:
+```bash
+php -S localhost:8000
+```
+
+Then open your browser and navigate to:
+```
+http://localhost:8000
+```
