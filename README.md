@@ -1,4 +1,20 @@
-Yrgopelag - Four Walls 
+<h1 align="center">
+Yrgopelag - Four Walls
+</h1>
+<p align="center">
+
+  <img src="https://img.shields.io/badge/PHP-777BB4?logo=php&logoColor=white">
+  <img src="https://img.shields.io/badge/JavaScript-yellow?logo=javascript">
+  <img src="https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=white">
+
+<p align="center">
+  https://webbegrim.se/fourwalls/ <br>
+</p>
+<p align="center">
+<img width="857" height="348" alt="Screenshot 2026-04-20 at 11 08 45" src="https://github.com/user-attachments/assets/23efe737-ed7d-47c8-8e12-420390ddc322" />
+</p>
+
+</br>
 
 Four Walls is a hotel booking website for a fictional hotel in the Yrgopelag archipelago.
 
@@ -10,55 +26,57 @@ The system prevents overlapping bookings, applies a 10% discount for returning g
 
 The project is built using PHP, SQLite, HTML, CSS, and JavaScript, with payment handling integrated via the Yrgopelag Central Bank API.
 
-
 The application is designed for desktop use only.
 
+---
 
+## Prerequisites
 
-References:
+Before installing Four Walls, ensure you have the following installed on your system:
 
-Custom radio buttons:
-https://moderncss.dev/pure-css-custom-styled-radio-buttons/
+- **PHP** (version 8.0 or higher)
+- **Composer** (PHP dependency manager)
+- **SQLite3** (usually included with PHP)
 
-SVG integration, and loading data: 
-https://www.youtube.com/watch?v=tk3ivPgOwpc&t=215s
+## Installation
 
-Code review:
+Follow these steps to set up Four Walls locally:
 
-index.php (example lines 41–50)
-Consider connecting <label> and <input> elements using the 'for' and 'id' attributes. It improves accessibility and usability.
-Reference: https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/label#associating_a_label_with_a_form_control
+### 1. Clone the Repository
+```bash
+git clone https://github.com/Timalm90/Yrgopelago-FourWalls.git
+cd Yrgopelago-FourWalls
+```
 
-loadData.php (file structure)
-This file could be placed in its own directory (ex. data/) or inside a backend/ directory to better describe its function and improve project structure.
+### 2. Install PHP Dependencies
+```bash
+composer install
+```
 
-booking.php (lines 24–25)
-You could use filter_var() + htmlspecialchars to sanitize user input to improve security and input validation.
+This will install the required packages:
+- `vlucas/phpdotenv` - For environment variable management
+- `guzzlehttp/guzzle` - For HTTP requests to the Central Bank API
 
-loadData.php (line 19)
-It’s not clear why array_reverse() is used on the rooms array here. A short comment explaining the intention would improve readability.
+### 3. Set Up Environment Variables
+Create a `.env` file in the root directory with your Central Bank API configuration:
+```
+BANK_API_URL=https://api.yrgopelag.local
+BANK_API_KEY=your_api_key_here
+```
 
-loadData.php (lines 40–43)
-This loop doesn’t actually load data, which makes it slightly misleading given the file’s purpose (name). It could instead be placed where the features are used, or made into a function that lives in a shared file (ex. functions.php).
+### 4. Initialize the Database
+The SQLite database is included at `backend/database/database.db`. If needed, you can reinitialize it by running:
+```bash
+php loadData.php
+```
 
-README
-The README could include information about Gruzzle (since the application uses it), and how to install it. A link to the official installation would be good too.
+### 5. Run a Local Server
+Start a PHP development server:
+```bash
+php -S localhost:8000
+```
 
-styles.css (general)
-There are many empty lines between and inside code blocks. While this is readable, reducing them slightly could improve consistency and make the file easier to scan.
-
-styles.css (lines 135–141)
-You could use CSS shorthands to reduce repetition, for example:
-border: 1px solid #6b7280; or padding: 0.5rem 0.75rem;
-This saves time and improves readability.
-
-booking.php (line 125)
-The discount value is hardcoded. Perhaps it could be stores in a variable or in the database instead, which would make it easier to update and maintain.
-
-LICENSE (line 3)
-The license file should contain the author’s full name.
-Referance: https://license.md/licenses/mit-license/#:~:text=Full%20License%20Text.%20MIT%20License%20Copyright%20(c),copies%20or%20substantial%20portions%20of%20the%20Software.
-
-Comments throughout the project
-Comments are generally helpful, but they could focus more on why certain decisions were made rather than what the code does. This would make the reasoning behind the code clearer for those who code review.
-
+Then open your browser and navigate to:
+```
+http://localhost:8000
+```
